@@ -6,6 +6,11 @@ our $VERSION = "0.0.0-prealpha";
 
 use Aion -role;
 
+aspect arg => sub {
+	my ($cls, $name, $arg, $construct, $feature) = @_;
+
+};
+
 # Командная строка. Но можно указывать только аргументы
 has commandline => (is => "ro", isa => NonEmptyStr);
 
@@ -41,7 +46,7 @@ has _view => (is => "ro-", isa => HashRef, default => sub {
 	
 	my ($pkg, $method) = split /#/, $command->{action};
 	
-	include $pkg;
+	eval "require $pkg" unless $pkg->isa('new');
 	
 	my @real_args; my @args = @{$self->args};
 	shift @args;
