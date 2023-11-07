@@ -1,5 +1,4 @@
 package Aion::Run;
-# Запускает команды
 use common::sense;
 
 our $VERSION = "0.0.0-prealpha";
@@ -8,95 +7,12 @@ use Aion -role;
 
 aspect arg => sub {
 	my ($cls, $name, $arg, $construct, $feature) = @_;
-
+	die "has $name: arg=`$arg` - and only `-A` parameters are allowed!" unless $arg =~ /^(?:-\w|\d+)\z/a;
+	$feature->{arg} = $arg;
 };
 
-# Командная строка. Но можно указывать только аргументы
-has commandline => (is => "ro", isa => NonEmptyStr);
-
-# аргументы
-has args => (is => "ro", isa => ArrayRef[Str], default => sub {
-	my ($self) = @_;
-	[ split /\s+/, $self->commandline ]
-});
-
-# Путь к файлу с командами
-has path => (is => "ro", default => $main_config::run_path);
-
-# Команды
-has runs => (is => "ro", isa => HashRef, default => sub {
-	my ($self) = @_;
-	from_json(read_file $self->path)->{run}
-});
-
-# Имя команды
-has name => (is => "ro", isa => Str, default => sub {
-	my ($self) = @_;
-	$self->args->[0] // "runs"
-});
-
-# Парсер команды
-has _view => (is => "ro-", isa => HashRef, default => sub {
-	my ($self) = @_;
-	
-	my $name = $self->name;
-	my $command = $self->runs->{$name};
-	
-	return {} if !$command;
-	
-	my ($pkg, $method) = split /#/, $command->{action};
-	
-	eval "require $pkg" unless $pkg->isa('new');
-	
-	my @real_args; my @args = @{$self->args};
-	shift @args;
-	my $view = create_from_cmdline($pkg, \@args, \@real_args);
-	
-	return {
-		view => $view,
-		argv => \@real_args,
-		method => $method,
-	};
-});
-
-# Неименованные параметры команды
-has argv => (is => "ro", isa => ArrayRef[Str], default => sub {
-	my ($self) = @_;
-	$self->_view->{argv}
-});
-
-# Метод
-has method => (is => "ro", isa => Str, default => sub {
-	my ($self) = @_;
-	$self->_view->{method}
-});
-
-# Неименованные параметры команды
-has view => (is => "ro", isa => Object, default => sub {
-	my ($self) = @_;
-	$self->_view->{view}
-});
-
-
-# запускатель команды
-sub run {
-	my ($self) = @_;	
-
-	return warncolor "Нет команды #RED%s#RESET\n", $self->name if !$self->exists;
-	
-	my $view = $self->view;
-	my $method = $self->method;
-	$view->$method(@{$self->argv});
-}
-
-# Команда существует
-sub exists {
-	my ($self) = @_;
-	exists $self->runs->{$self->name}
-}
-
 # Создаёт объект с параметрами запроса
-sub create_from_cmdline {
+sub mkargs {
 	my ($view_class, $args, $real_args) = @_;
 
 	my $ATTRIBUTE = $view_class->ATTRIBUTE;
@@ -144,7 +60,7 @@ sub create_from_cmdline {
 	$view_class->new(%param)
 }
 
-# Команда run/run „Выполняет код perl-а в контексте библиотеки query”
+#@run run/run „Выполняет код perl-а в контексте библиотеки query”
 sub run_code {
 	my ($self, $code) = @_;
 	
@@ -154,7 +70,7 @@ sub run_code {
 	p $x;
 }
 
-# Команда run/runs „Список команд”
+#@run run/runs „Список команд”
 sub list {
 	my ($self) = @_;
 	
