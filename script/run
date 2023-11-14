@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+# rubric: run
+# remark: „Executes Perl code in the context of the current project”
+#   name: run
+use Aion::Run::RunScript;
+Aion::Run::RunScript->new_from_args(\@ARGV)->run;

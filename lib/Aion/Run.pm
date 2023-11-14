@@ -10,7 +10,7 @@ aspect arg => sub {
 	my ($pkg, $name, $arg, $construct, $feature) = @_;
 	die "has $name: arg=`$arg` - and only `-A` parameters are allowed!" unless $arg =~ /^(?:-\w|\d+)\z/a;
 	$feature->{arg} = $arg;
-	$Aion::META{arg}{$pkg}{$arg} = $feature;
+	$Aion::META{$pkg}{arg}{$arg} = $feature;
 };
 
 # Создаёт объект с параметрами запроса
@@ -41,7 +41,7 @@ sub new_from_args {
 		}
 	};
 
-	my $count = 1;
+	my $count = 0;
 
 	for(my $i=0; $i<@$args; $i++) {
 		local $_ = $args->[$i];
@@ -49,16 +49,19 @@ sub new_from_args {
 			$set_feature->($1, $2);
 		} elsif(/^-(\w+)\z/a) {
 			for(split //, $1) {
-				my $key = $ARG->{"-$_"};
+				my $feature = $ARG->{"-$_"};
+				my $key = $feature->{name};
 				my $feature = $get_feature->($key);
 				if($feature->{isa}{name} eq "Bool") {
-					$set_feature->($key, 1);
+					$set_feature->($key, !!$feature->{default});
 				} else {
 					$set_feature->($key, $args->[++$i]);
 				}
 			}
 		} else {
-			$set_feature->($count++, $_);
+			my $feature = $ARG->{++$count};
+			my $key = $feature->{name};
+			$set_feature->($key, $_);
 		}
 	}
 

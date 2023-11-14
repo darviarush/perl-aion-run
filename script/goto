@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+# rubric: run
+# remark: „Go to command, method, or file”
+#   name: goto
+use Aion::Run::GotoScript;
+Aion::Run::GotoScript->new_from_args(\@ARGV)->goto;
