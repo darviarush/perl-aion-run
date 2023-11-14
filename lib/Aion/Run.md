@@ -28,6 +28,15 @@ my $aion_run = Aion::Run->new();
 my $aion_run = Aion::Run->new();
 ```
 
+## new_from_args ($pkg, $args)
+
+Создаёт объект с параметрами запроса
+
+```perl
+my $aion_run = Aion::Run->new;
+$aion_run->new_from_args($pkg, $args)  # -> .3
+```
+
 # INSTALL
 
 Add to **cpanfile** in your project:
