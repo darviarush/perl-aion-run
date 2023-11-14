@@ -15,12 +15,9 @@ has mask => (is => "ro", isa => Maybe[Str], arg => 1);
 sub list {
 	my ($self) = @_;
 
-    my @runs = $self->runs;
-	
-
-	@runs = sort {
+	my @runs = sort {
 		$a->{rubric} eq $b->{rubric}? ($a->{name} cmp $b->{name}): $a->{rubric} cmp $b->{rubric}
-	} @runs;
+	} $self->runs;
 
 	my $len = max map length $_->{name}, @runs;
 
@@ -49,7 +46,10 @@ sub runs {
 			&& <$f> =~ m{^#!/usr/bin/env perl}
 			&& <$f> =~ /^# rubric: (.*)/ && ($x{rubric} = $1)
 			&& <$f> =~ /^# remark: (.*)/ && ($x{remark} = $1)
-			&& <$f> =~ /^#   name: (.*)/ && (  $x{name} = $1);
+			&& <$f> =~ /^#   name: (.*)/ && (  $x{name} = $1)
+			&& <$f> =~ /^use ([\w:]+);/  && (   $x{pkg} = $1)
+			&& <$f> =~ /^(?:[\w:]+)->new_from_args\(\\\@ARGV\)->(\w+);/
+				&& ($x{method} = $1);
 
 			close $f;
 

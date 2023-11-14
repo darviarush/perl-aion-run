@@ -1,39 +1,39 @@
 package Aion::Run::GotoScript;
 use common::sense;
 
-use Aion::Fs qw/goto_editor/;
+use Aion::Fs qw/cat goto_editor/;
 use Aion::Run::ListScript;
 use List::Util qw/first/;
+
 use Aion;
 
 with qw/Aion::Run/;
 
 # Скрипт, фича, метод или файл со строкой
 # Script, feature, method or file with a line number
-has line => (is => "ro", isa => Str, arg => 1);
+has line => (is => "ro+", isa => Str, arg => 1);
 
 # Перейти к команде, фиче, методу или файлу
 #@run run/goto „Go to script, feature, method or file with a line number”
 sub goto {
 	my ($self) = @_;
 
+	my $arg = $self->line;
 	my ($file, $line);
 	# Перейти к строке файла
-	if($self->line =~ /(\S+) line (\d+)/) {
+	if($arg =~ /(\S+) line (\d+)/) {
 		($file, $line) = ($1, $2);
 		$file = _find_file($file) if $file !~ /^!/;
 	}
-	elsif($self->line =~ /^(\w+)$/) { # К скрипту
-		my $script = $1;
-		my $s = first { $_->{name} eq $script } Aion::Run::ListScript->new->runs;
-		my ($pkg, $method) = ;
+	elsif($arg =~ /^\w+$/) { # К скрипту
+		my $script = first { $_->{name} eq $arg } Aion::Run::ListScript->new->runs;
 
-		return warn "Нет такой команды!\n" if !$method;
+		die "Script `$arg` not found!" if !$script;
 
-		($file, $line) = $self->_method2file($pkg, $method);
+		($file, $line) = _method2file($script->{pkg}, $script->{method});
 	}
 	else { # К методу или фиче
-
+		($file, $line) = _method2file(split /#/, $arg);
 	}
 
 	goto_editor $file, $line;
@@ -41,11 +41,11 @@ sub goto {
 
 # Найти строку в файле, где находится метод
 sub _method2file {
-	my ($self, $pkg, $method) = @_;
+	my ($pkg, $method) = @_;
 
-	my $file = "lib/" . ($pkg =~ s!::!/!gr) . ".pm";
-	my $f = read_file $file;
-	$f =~ /^(.*\n)sub[ \t]+$method\b/s or die "Нет метода $method в $file";
+	my $file = _find_file(($pkg =~ s!::!/!gr) . ".pm");
+	my $f = cat $file;
+	$f =~ /^(.*\n)(sub|has)\s+$method\b/s or die "Method `$method` in `$file` not found!";
 	my $x = $1; my $line = 1;
 	$line++ while $x =~ /\n/g;
 
@@ -54,9 +54,9 @@ sub _method2file {
 
 # Найти файл в @INC
 sub _find_file {
-	my ($self, $file) = @_;
+	my ($file) = @_;
 
-	for(@INC) {
+	for("lib", @INC) {
 		my $path = "$_/$file";
 		return $path if -e $path;
 	}
