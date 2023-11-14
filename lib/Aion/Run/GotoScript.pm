@@ -2,7 +2,8 @@ package Aion::Run::GotoScript;
 use common::sense;
 
 use Aion::Fs qw/goto_editor/;
-
+use Aion::Run::ListScript;
+use List::Util qw/first/;
 use Aion;
 
 with qw/Aion::Run/;
@@ -22,15 +23,17 @@ sub goto {
 		($file, $line) = ($1, $2);
 		$file = _find_file($file) if $file !~ /^!/;
 	}
-	elsif($self->line =~ /^\w+$/) { # К скрипту
-		my ($pkg, $method) = split /#/, $self->runs->{$run}{action};
+	elsif($self->line =~ /^(\w+)$/) { # К скрипту
+		my $script = $1;
+		my $s = first { $_->{name} eq $script } Aion::Run::ListScript->new->runs;
+		my ($pkg, $method) = ;
 
 		return warn "Нет такой команды!\n" if !$method;
 
 		($file, $line) = $self->_method2file($pkg, $method);
 	}
 	else { # К методу или фиче
-		
+
 	}
 
 	goto_editor $file, $line;

@@ -11,15 +11,35 @@ with qw/Aion::Run/;
 # Mask for filter about commands
 has mask => (is => "ro", isa => Maybe[Str], arg => 1);
 
-my $PATH_SEP = $^O =~ /MSWin|Windows_NT/i ? ";" : ":";
-
 #@run run/runs „List of scripts”
 sub list {
 	my ($self) = @_;
 
-    my $mask = $self->mask;
+    my @runs = $self->runs;
+	
+
+	@runs = sort {
+		$a->{rubric} eq $b->{rubric}? ($a->{name} cmp $b->{name}): $a->{rubric} cmp $b->{rubric}
+	} @runs;
+
+	my $len = max map length $_->{name}, @runs;
+
+	my $rubric;
+	for(@runs) {
+		printcolor "#yellow%s#r\n", $rubric = $_->{rubric} if $rubric ne $_->{rubric};
+
+		printcolor "  #green%-${len}s #{bold black}%s#r\n", $_->{name}, $_->{remark};
+	}
+}
+
+my $PATH_SEP = $^O =~ /MSWin|Windows_NT/i ? ";" : ":";
+
+# Возвращает список скриптов
+sub runs {
+	my ($self) = @_;
 	my @runs;
 	my $f;
+	my $mask = $self->mask;
 
 	for("script", split $PATH_SEP, $ENV{PATH}) {
 		push @runs, map {
@@ -36,19 +56,8 @@ sub list {
 			$ok? \%x: ()
 		} <$_/*> if -d;
 	};
-
-	@runs = sort {
-		$a->{rubric} eq $b->{rubric}? ($a->{name} cmp $b->{name}): $a->{rubric} cmp $b->{rubric}
-	} @runs;
-
-	my $len = max map length $_->{name}, @runs;
-
-	my $rubric;
-	for(@runs) {
-		printcolor "#yellow%s#r\n", $rubric = $_->{rubric} if $rubric ne $_->{rubric};
-
-		printcolor "  #green%-${len}s #{bold black}%s#r\n", $_->{name}, $_->{remark};
-	}
+	
+	@runs
 }
 
 1;
