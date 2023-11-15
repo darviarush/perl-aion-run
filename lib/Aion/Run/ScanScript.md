@@ -1,53 +1,59 @@
 # NAME
 
-Aion::Run::ScanScript - 
+Aion::Run::ScanScript - script "ann" for appling annotations in perl-modules in the current project
 
 # SYNOPSIS
 
+File lib/Aion/FirstExample/Annotation.pm:
+```perl
+package Aion::FirstExample::Annotation;
+
+our @ex;
+
+sub apply {
+    my ($pkg, $sub, $annotation) = @_;
+    push @ex, [$pkg, $sub, $annotation];
+}
+
+1;
+```
+
+File lib/Ex.pm:
+```perl
+package Ex;
+
+#@first-example hi! „First example”
+sub mysub {}
+
+1;
+```
+
 ```perl
 use Aion::Run::ScanScript;
+Aion::Run::ScanScript->new(show=>0)->apply_annotations;
 
-my $aion_run_scanScript = Aion::Run::ScanScript->new;
+\@Aion::FirstExample::Annotation::ex # --> ["Ex", "mysub", "hi! „First example”"]
 ```
 
 # DESCRIPTION
 
-.
+Annotation is the line as `#@name paramline` before subroutine. Script `ann` (same as `Aion::Run::ScanScript->new(show=>XXX)->apply_annotations`) and load perl-module as `Aion::{name}::Annotation` and call `apply`-subroutine from it.
 
 # FEATURES
 
 ## show
 
-.
-
-```perl
-my $aion_run_scanScript = Aion::Run::ScanScript->new;
-
-$aion_run_scanScript->show	# -> .5
-```
+Showing scan-process to stdout.
 
 # SUBROUTINES
 
 ## apply_annotations ()
 
-@run run/ann „Scans the current project and applies annotations”
-
-```perl
-my $aion_run_scanScript = Aion::Run::ScanScript->new;
-$aion_run_scanScript->apply_annotations  # -> .3
-```
-
-# INSTALL
-
-For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
-
-```sh
-sudo cpm install -gvv Aion::Run::ScanScript
-```
+Scans the current project and applies annotations.
 
 # AUTHOR
 
-Yaroslav O. Kosmina [darviarush@mail.ru](mailto:darviarush@mail.ru)
+Yaroslav O. Kosmina <darviarush@mail.ru>
 
 # LICENSE
 

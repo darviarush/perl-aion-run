@@ -16,8 +16,11 @@ use Aion;
 
 with qw/Aion::Run/;
 
+# Operands for calculations
 has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a");
-has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => "-o");
+
+# Operator for calculations
+has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => 1);
 
 #@run math/calc „Calculate”
 sub calculate_sum {
@@ -35,31 +38,37 @@ sub calculate_sum {
 1;
 ```
 
-```
-`perl -`
+```perl
+use Aion::Run::ScanScript;
+
+# Apply annotations:
+Aion::Run::ScanScript->new(show => 0)->apply_annotations;
+
+-x "script/calc"  # -> 1
+-x "$ENV{HOME}/.local/bin/calc"  # -> 1
+
+`calc -a 1 -a 2 -a 3 +`  # -> 6
+`calc '*' --operands=4 --operands=2`  # -> 8
+
+unlink "$ENV{HOME}/.local/bin/calc";
 ```
 
 # DESCRIPTION
 
+Role `Aion::Run` implements aspect `arg` for make feature as command-line param.
 
+* `arg => number` — make ordered parameter.
+* `arg => "-X"` — make keyed parameter.
 
 # METHODS
 
-## 
-
-.
-
-```perl
-my $aion_run = Aion::Run->new();
-```
-
 ## new_from_args ($pkg, $args)
 
-Создаёт объект с параметрами запроса
+Constructor. It creates a script-object with command-line parameters.
 
 ```perl
-my $aion_run = Aion::Run->new;
-$aion_run->new_from_args($pkg, $args)  # -> .3
+use Scripts::MyScript;
+Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands  # --> [1,2,3]
 ```
 
 # INSTALL

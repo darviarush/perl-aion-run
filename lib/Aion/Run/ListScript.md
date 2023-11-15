@@ -1,13 +1,14 @@
 # NAME
 
-Aion::Run::ListScript - 
+Aion::Run::ListScript - list of scripts maked annotation `#@run`
 
 # SYNOPSIS
 
 ```perl
 use Aion::Run::ListScript;
 
-my $aion_run_listScript = Aion::Run::ListScript->new;
+
+Aion::Run::ListScript->new->list
 ```
 
 # DESCRIPTION
