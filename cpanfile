@@ -11,6 +11,7 @@ on 'test' => sub {
 };
 
 requires 'Aion', '0.1';
-requires 'Aion::Fs', '0.0.3';
+requires 'Aion::Fs', '0.0.6';
+requires 'Aion::Format', '0.0.3';
 requires 'common::sense', '3.75';
 requires 'Data::Printer', '1.000004';

@@ -56,7 +56,7 @@ sub _method2file {
 sub _find_file {
 	my ($file) = @_;
 
-	for("lib", @INC) {
+	for(@INC) {
 		my $path = "$_/$file";
 		return $path if -e $path;
 	}
@@ -65,3 +65,58 @@ sub _find_file {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Aion::Run::GotoScript - 
+
+=head1 SYNOPSIS
+
+	use Aion::Run::GotoScript;
+	
+	my $aion_run_gotoScript = Aion::Run::GotoScript->new;
+
+=head1 DESCRIPTION
+
+.
+
+=head1 FEATURES
+
+=head2 line
+
+.
+
+	my $aion_run_gotoScript = Aion::Run::GotoScript->new;
+	
+	$aion_run_gotoScript->line	# -> .5
+
+=head1 SUBROUTINES
+
+=head2 goto ()
+
+@run run/goto „Go to script, feature, method or file with a line number”
+
+	my $aion_run_gotoScript = Aion::Run::GotoScript->new;
+	$aion_run_gotoScript->goto  # -> .3
+
+=head1 INSTALL
+
+For install this module in your system run next LL<https://metacpan.org/pod/App::cpm>:
+
+	sudo cpm install -gvv Aion::Run::GotoScript
+
+=head1 AUTHOR
+
+Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+
+=head1 LICENSE
+
+⚖ B<GPLv3>
+
+=head1 COPYRIGHT
+
+The Aion::Run::GotoScript module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.

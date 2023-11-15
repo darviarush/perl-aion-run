@@ -8,10 +8,35 @@ Aion::Run - role for make console commands
 
 # SYNOPSIS
 
+File lib/Scripts/MyScript.pm:
 ```perl
-use Aion::Run;
+package Scripts::MyScript;
+use common::sense;
+use Aion;
 
-my $aion_run = Aion::Run->new();
+with qw/Aion::Run/;
+
+has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a");
+has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => "-o");
+
+#@run math/calc „Calculate”
+sub calculate_sum {
+    my ($self) = @_;
+    printf "Result: %g", reduce {
+        given($self->operator) {
+            $a+$b when /\+/;
+            $a-$b when /\-/;
+            $a*$b when /\*/;
+            $a/$b when /\//;
+        }
+    } @{$self->operands};
+}
+
+1;
+```
+
+```
+`perl -`
 ```
 
 # DESCRIPTION

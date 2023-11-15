@@ -61,3 +61,65 @@ sub runs {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Aion::Run::ListScript - 
+
+=head1 SYNOPSIS
+
+	use Aion::Run::ListScript;
+	
+	my $aion_run_listScript = Aion::Run::ListScript->new;
+
+=head1 DESCRIPTION
+
+.
+
+=head1 FEATURES
+
+=head2 mask
+
+.
+
+	my $aion_run_listScript = Aion::Run::ListScript->new;
+	
+	$aion_run_listScript->mask	# -> .5
+
+=head1 SUBROUTINES
+
+=head2 list ()
+
+@run run/runs „List of scripts”
+
+	my $aion_run_listScript = Aion::Run::ListScript->new;
+	$aion_run_listScript->list  # -> .3
+
+=head2 runs ()
+
+Возвращает список скриптов
+
+	my $aion_run_listScript = Aion::Run::ListScript->new;
+	$aion_run_listScript->runs  # -> .3
+
+=head1 INSTALL
+
+For install this module in your system run next LL<https://metacpan.org/pod/App::cpm>:
+
+	sudo cpm install -gvv Aion::Run::ListScript
+
+=head1 AUTHOR
+
+Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+
+=head1 LICENSE
+
+⚖ B<GPLv3>
+
+=head1 COPYRIGHT
+
+The Aion::Run::ListScript module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.

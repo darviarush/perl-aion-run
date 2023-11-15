@@ -40,3 +40,58 @@ sub run {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Aion::Run::RunScript - 
+
+=head1 SYNOPSIS
+
+	use Aion::Run::RunScript;
+	
+	my $aion_run_runScript = Aion::Run::RunScript->new;
+
+=head1 DESCRIPTION
+
+.
+
+=head1 FEATURES
+
+=head2 code
+
+.
+
+	my $aion_run_runScript = Aion::Run::RunScript->new;
+	
+	$aion_run_runScript->code	# -> .5
+
+=head1 SUBROUTINES
+
+=head2 run ()
+
+@run run/run „Executes Perl code in the context of the current project”
+
+	my $aion_run_runScript = Aion::Run::RunScript->new;
+	$aion_run_runScript->run  # -> .3
+
+=head1 INSTALL
+
+For install this module in your system run next LL<https://metacpan.org/pod/App::cpm>:
+
+	sudo cpm install -gvv Aion::Run::RunScript
+
+=head1 AUTHOR
+
+Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+
+=head1 LICENSE
+
+⚖ B<GPLv3>
+
+=head1 COPYRIGHT
+
+The Aion::Run::RunScript module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.

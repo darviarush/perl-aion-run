@@ -1,6 +1,6 @@
 # NAME
 
-Aion::Run - .
+Aion::Run - role for make console commands
 
 # VERSION
 
@@ -16,9 +16,9 @@ my $aion_run = Aion::Run->new();
 
 # DESCRIPTION
 
-Aion::Run — .
 
-# SUBROUTINES/METHODS
+
+# METHODS
 
 ## 
 
@@ -26,6 +26,15 @@ Aion::Run — .
 
 ```perl
 my $aion_run = Aion::Run->new();
+```
+
+## new_from_args ($pkg, $args)
+
+Создаёт объект с параметрами запроса
+
+```perl
+my $aion_run = Aion::Run->new;
+$aion_run->new_from_args($pkg, $args)  # -> .3
 ```
 
 # INSTALL
@@ -47,7 +56,7 @@ $ sudo cpm install -gvv
 
 # AUTHOR
 
-Yaroslav O. Kosmina [dart@cpan.org](mailto:dart@cpan.org)
+Yaroslav O. Kosmina <dart@cpan.org>
 
 # LICENSE
 

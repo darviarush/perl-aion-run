@@ -69,3 +69,59 @@ sub new_from_args {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Aion::Run - role for make console commands
+
+=head1 VERSION
+
+0.0.0-prealpha
+
+=head1 SYNOPSIS
+
+	use Aion::Run;
+	
+	my $aion_run = Aion::Run->new();
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2  
+
+.
+
+	my $aion_run = Aion::Run->new();
+
+=head2 new_from_args ($pkg, $args)
+
+Создаёт объект с параметрами запроса
+
+	my $aion_run = Aion::Run->new;
+	$aion_run->new_from_args($pkg, $args)  # -> .3
+
+=head1 INSTALL
+
+Add to B<cpanfile> in your project:
+
+	requires 'Aion::Run',
+	    git => 'https://github.com/darviarush/perl-aion-run.git',
+	    ref => 'master',
+	;
+
+And run command:
+
+	$ sudo cpm install -gvv
+
+=head1 AUTHOR
+
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
+
+=head1 LICENSE
+
+⚖ B<GPLv3>
