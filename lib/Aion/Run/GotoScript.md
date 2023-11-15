@@ -1,6 +1,6 @@
 # NAME
 
-Aion::Run::GotoScript - 
+Aion::Run::GotoScript - open in editor 
 
 # SYNOPSIS
 
@@ -18,36 +18,22 @@ my $aion_run_gotoScript = Aion::Run::GotoScript->new;
 
 ## line
 
-.
-
-```perl
-my $aion_run_gotoScript = Aion::Run::GotoScript->new;
-
-$aion_run_gotoScript->line	# -> .5
-```
+Script-name, feature, method or file with a line number
 
 # SUBROUTINES
 
 ## goto ()
 
-@run run/goto „Go to script, feature, method or file with a line number”
+Go to script, feature, method or file with a line number.
 
 ```perl
 my $aion_run_gotoScript = Aion::Run::GotoScript->new;
 $aion_run_gotoScript->goto  # -> .3
 ```
 
-# INSTALL
-
-For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
-
-```sh
-sudo cpm install -gvv Aion::Run::GotoScript
-```
-
 # AUTHOR
 
-Yaroslav O. Kosmina [darviarush@mail.ru](mailto:darviarush@mail.ru)
+Yaroslav O. Kosmina <darviarush@mail.ru>
 
 # LICENSE
 

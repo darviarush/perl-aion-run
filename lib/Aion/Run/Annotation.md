@@ -1,13 +1,13 @@
 # NAME
 
-Aion::Run::Annotation - 
+Aion::Run::Annotation - appling annotation `#@run` for maked scripts
 
 # SYNOPSIS
 
 ```perl
 use Aion::Run::Annotation;
 
-my $aion_run_annotation = Aion::Run::Annotation->new;
+Aion::Run::Annotation->can("apply")->("", "", "");
 ```
 
 # DESCRIPTION
@@ -18,24 +18,11 @@ my $aion_run_annotation = Aion::Run::Annotation->new;
 
 ## apply ($pkg, $sub, $annotation)
 
-Создаёт по аннотации скрипт
-
-```perl
-my $aion_run_annotation = Aion::Run::Annotation->new;
-$aion_run_annotation->apply($pkg, $sub, $annotation)  # -> .3
-```
-
-# INSTALL
-
-For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
-
-```sh
-sudo cpm install -gvv Aion::Run::Annotation
-```
+Creates a script based on an annotation.
 
 # AUTHOR
 
-Yaroslav O. Kosmina [darviarush@mail.ru](mailto:darviarush@mail.ru)
+Yaroslav O. Kosmina <darviarush@mail.ru>
 
 # LICENSE
 
