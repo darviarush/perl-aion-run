@@ -68,13 +68,14 @@ __END__
 
 =head1 NAME
 
-Aion::Run::ListScript - 
+Aion::Run::ListScript - list of scripts maked annotation C<#@run>
 
 =head1 SYNOPSIS
 
 	use Aion::Run::ListScript;
 	
-	my $aion_run_listScript = Aion::Run::ListScript->new;
+	
+	Aion::Run::ListScript->new->list
 
 =head1 DESCRIPTION
 
@@ -86,35 +87,24 @@ Aion::Run::ListScript -
 
 .
 
-	my $aion_run_listScript = Aion::Run::ListScript->new;
-	
-	$aion_run_listScript->mask	# -> .5
-
 =head1 SUBROUTINES
 
 =head2 list ()
 
-@run run/runs „List of scripts”
+List of scripts printed to stdout.
 
 	my $aion_run_listScript = Aion::Run::ListScript->new;
 	$aion_run_listScript->list  # -> .3
 
 =head2 runs ()
 
-Возвращает список скриптов
+Returns a list of scripts.
 
-	my $aion_run_listScript = Aion::Run::ListScript->new;
-	$aion_run_listScript->runs  # -> .3
-
-=head1 INSTALL
-
-For install this module in your system run next LL<https://metacpan.org/pod/App::cpm>:
-
-	sudo cpm install -gvv Aion::Run::ListScript
+	Aion::Run::ListScript->new->runs  # --> ["", ""]
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+Yaroslav O. Kosmina L<mailto:darviarush@mail.ru>
 
 =head1 LICENSE
 

@@ -47,46 +47,34 @@ __END__
 
 =head1 NAME
 
-Aion::Run::RunScript - 
+Aion::Run::RunScript - evaluate perl-code and print result to stdout
 
 =head1 SYNOPSIS
 
+	use Aion::Format qw/trappout/;
 	use Aion::Run::RunScript;
 	
-	my $aion_run_runScript = Aion::Run::RunScript->new;
+	trappout { Aion::Run::RunScript->new(code => "1+2")->run }  # => 3
 
 =head1 DESCRIPTION
 
-.
+This class implements script C<< $ run E<lt>codeE<gt> >> for evaluation.
 
 =head1 FEATURES
 
 =head2 code
 
-.
-
-	my $aion_run_runScript = Aion::Run::RunScript->new;
-	
-	$aion_run_runScript->code	# -> .5
+Code for evaluation.
 
 =head1 SUBROUTINES
 
 =head2 run ()
 
-@run run/run „Executes Perl code in the context of the current project”
-
-	my $aion_run_runScript = Aion::Run::RunScript->new;
-	$aion_run_runScript->run  # -> .3
-
-=head1 INSTALL
-
-For install this module in your system run next LL<https://metacpan.org/pod/App::cpm>:
-
-	sudo cpm install -gvv Aion::Run::RunScript
+Executes Perl code in the context of the current project.
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+Yaroslav O. Kosmina L<mailto:darviarush@mail.ru>
 
 =head1 LICENSE
 

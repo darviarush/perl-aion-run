@@ -84,39 +84,73 @@ Aion::Run - role for make console commands
 
 =head1 SYNOPSIS
 
-	use Aion::Run;
+File lib/Scripts/MyScript.pm:
+
+	package Scripts::MyScript;
+	use common::sense;
+	use Aion;
 	
-	my $aion_run = Aion::Run->new();
+	use DDP; p @INC;
+	
+	with qw/Aion::Run/;
+	
+	# Operands for calculations
+	has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a");
+	
+	# Operator for calculations
+	has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => 1);
+	
+	#@run math/calc „Calculate”
+	sub calculate_sum {
+	    my ($self) = @_;
+	    printf "Result: %g", reduce {
+	        given($self->operator) {
+	            $a+$b when /\+/;
+	            $a-$b when /\-/;
+	            $a*$b when /\*/;
+	            $a/$b when /\//;
+	        }
+	    } @{$self->operands};
+	}
+	
+	1;
+
+
+
+	use Aion::Run::ScanScript;
+	
+	# Apply annotations:
+	Aion::Run::ScanScript->new(show => 0)->apply_annotations;
+	
+	-x "script/calc"  # -> 1
+	-x "$ENV{HOME}/.local/bin/calc"  # -> 1
+	
+	`calc -a 1 -a 2 -a 3 +`  # -> 6
+	`calc '*' --operands=4 --operands=2`  # -> 8
+	
+	unlink "$ENV{HOME}/.local/bin/calc";
 
 =head1 DESCRIPTION
 
+Role C<Aion::Run> implements aspect C<arg> for make feature as command-line param.
+
+=over
+
+=item * C<< arg =E<gt> number >> — make ordered parameter.
+
+=item * C<< arg =E<gt> "-X" >> — make keyed parameter.
+
+=back
+
 =head1 METHODS
-
-=head2  
-
-.
-
-	my $aion_run = Aion::Run->new();
 
 =head2 new_from_args ($pkg, $args)
 
-Создаёт объект с параметрами запроса
+Constructor. It creates a script-object with command-line parameters.
 
-	my $aion_run = Aion::Run->new;
-	$aion_run->new_from_args($pkg, $args)  # -> .3
-
-=head1 INSTALL
-
-Add to B<cpanfile> in your project:
-
-	requires 'Aion::Run',
-	    git => 'https://github.com/darviarush/perl-aion-run.git',
-	    ref => 'master',
-	;
-
-And run command:
-
-	$ sudo cpm install -gvv
+	use lib "lib";
+	use Scripts::MyScript;
+	Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands  # --> [1,2,3]
 
 =head1 AUTHOR
 
@@ -125,3 +159,7 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 =head1 LICENSE
 
 ⚖ B<GPLv3>
+
+=head1 COPYRIGHT
+
+The Aion::Run module is copyright (с) 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.

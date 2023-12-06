@@ -8,50 +8,70 @@ use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { 
 # 
 # # SYNOPSIS
 # 
+# File lib/Scripts/MyScript.pm:
+#@> lib/Scripts/MyScript.pm
+#>> package Scripts::MyScript;
+#>> use common::sense;
+#>> use Aion;
+#>> 
+#>> use DDP; p @INC;
+#>> 
+#>> with qw/Aion::Run/;
+#>> 
+#>> # Operands for calculations
+#>> has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a");
+#>> 
+#>> # Operator for calculations
+#>> has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => 1);
+#>> 
+#>> #@run math/calc „Calculate”
+#>> sub calculate_sum {
+#>>     my ($self) = @_;
+#>>     printf "Result: %g", reduce {
+#>>         given($self->operator) {
+#>>             $a+$b when /\+/;
+#>>             $a-$b when /\-/;
+#>>             $a*$b when /\*/;
+#>>             $a/$b when /\//;
+#>>         }
+#>>     } @{$self->operands};
+#>> }
+#>> 
+#>> 1;
+#@< EOF
+# 
 subtest 'SYNOPSIS' => sub { 
-use Aion::Run;
+use Aion::Run::ScanScript;
 
-my $aion_run = Aion::Run->new();
+# Apply annotations:
+Aion::Run::ScanScript->new(show => 0)->apply_annotations;
+
+::is scalar do {-x "script/calc"}, scalar do{1}, '-x "script/calc"  # -> 1';
+::is scalar do {-x "$ENV{HOME}/.local/bin/calc"}, scalar do{1}, '-x "$ENV{HOME}/.local/bin/calc"  # -> 1';
+
+::is scalar do {`calc -a 1 -a 2 -a 3 +`}, scalar do{6}, '`calc -a 1 -a 2 -a 3 +`  # -> 6';
+::is scalar do {`calc '*' --operands=4 --operands=2`}, scalar do{8}, '`calc \'*\' --operands=4 --operands=2`  # -> 8';
+
+unlink "$ENV{HOME}/.local/bin/calc";
 
 # 
 # # DESCRIPTION
 # 
+# Role `Aion::Run` implements aspect `arg` for make feature as command-line param.
 # 
+# * `arg => number` — make ordered parameter.
+# * `arg => "-X"` — make keyed parameter.
 # 
 # # METHODS
 # 
-# ## 
-# 
-# .
-# 
-done_testing; }; subtest '' => sub { 
-my $aion_run = Aion::Run->new();
-
-# 
 # ## new_from_args ($pkg, $args)
 # 
-# Создаёт объект с параметрами запроса
+# Constructor. It creates a script-object with command-line parameters.
 # 
 done_testing; }; subtest 'new_from_args ($pkg, $args)' => sub { 
-my $aion_run = Aion::Run->new;
-::is scalar do {$aion_run->new_from_args($pkg, $args)}, scalar do{.3}, '$aion_run->new_from_args($pkg, $args)  # -> .3';
-
-# 
-# # INSTALL
-# 
-# Add to **cpanfile** in your project:
-# 
-
-# requires 'Aion::Run',
-#     git => 'https://github.com/darviarush/perl-aion-run.git',
-#     ref => 'master',
-# ;
-
-# 
-# And run command:
-# 
-
-# $ sudo cpm install -gvv
+use lib "lib";
+use Scripts::MyScript;
+::is_deeply scalar do {Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands}, scalar do {[1,2,3]}, 'Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands  # --> [1,2,3]';
 
 # 
 # # AUTHOR
@@ -61,6 +81,10 @@ my $aion_run = Aion::Run->new;
 # # LICENSE
 # 
 # ⚖ **GPLv3**
+# 
+# # COPYRIGHT
+# 
+# The Aion::Run module is copyright (с) 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
 
 	done_testing;
 };

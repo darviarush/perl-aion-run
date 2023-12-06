@@ -67,25 +67,9 @@ Role `Aion::Run` implements aspect `arg` for make feature as command-line param.
 Constructor. It creates a script-object with command-line parameters.
 
 ```perl
+use lib "lib";
 use Scripts::MyScript;
 Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands  # --> [1,2,3]
-```
-
-# INSTALL
-
-Add to **cpanfile** in your project:
-
-```cpanfile
-requires 'Aion::Run',
-    git => 'https://github.com/darviarush/perl-aion-run.git',
-    ref => 'master',
-;
-```
-
-And run command:
-
-```sh
-$ sudo cpm install -gvv
 ```
 
 # AUTHOR
@@ -95,3 +79,7 @@ Yaroslav O. Kosmina <dart@cpan.org>
 # LICENSE
 
 ⚖ **GPLv3**
+
+# COPYRIGHT
+
+The Aion::Run module is copyright (с) 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
