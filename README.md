@@ -1,6 +1,6 @@
 # NAME
 
-Aion::Run - role for make console commands
+Aion::Run - роль для консольных команд
 
 # VERSION
 
@@ -8,18 +8,21 @@ Aion::Run - role for make console commands
 
 # SYNOPSIS
 
-File lib/Scripts/MyScript.pm:
+Файл lib/Scripts/MyScript.pm:
 ```perl
 package Scripts::MyScript;
-use common::sense;
-use Aion;
 
-use DDP; p @INC;
+use common::sense;
+
+use List::Util qw/reduce/;
+use Aion::Format qw/trappout/;
+
+use Aion;
 
 with qw/Aion::Run/;
 
 # Operands for calculations
-has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a");
+has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a", init_arg => "operand");
 
 # Operator for calculations
 has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => 1);
@@ -27,7 +30,7 @@ has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => 1);
 #@run math/calc „Calculate”
 sub calculate_sum {
     my ($self) = @_;
-    printf "Result: %g", reduce {
+    printf "Result: %g\n", reduce {
         given($self->operator) {
             $a+$b when /\+/;
             $a-$b when /\-/;
@@ -41,38 +44,27 @@ sub calculate_sum {
 ```
 
 ```perl
-use Aion::Run::ScanScript;
+use Aion::Format qw/trappout/;
 
-# Apply annotations:
-Aion::Run::ScanScript->new(show => 0)->apply_annotations;
+use lib "lib";
+use Scripts::MyScript;
 
--x "script/calc"  # -> 1
--x "$ENV{HOME}/.local/bin/calc"  # -> 1
-
-`calc -a 1 -a 2 -a 3 +`  # -> 6
-`calc '*' --operands=4 --operands=2`  # -> 8
-
-unlink "$ENV{HOME}/.local/bin/calc";
+trappout { Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->calculate_sum } # => Result: 6\n
+trappout { Scripts::MyScript->new_from_args([qw/--operand=4 * --operand=2/])->calculate_sum } # => Result: 8\n
 ```
 
 # DESCRIPTION
 
-Role `Aion::Run` implements aspect `arg` for make feature as command-line param.
+Роль `Aion::Run` реализует аспект `arg` для установки фич из параметров командной строки.
 
-* `arg => number` — make ordered parameter.
-* `arg => "-X"` — make keyed parameter.
+* `arg => number` — порядковый параметр.
+* `arg => "-X"` — именованный параметр. Можно использовать как шорткут **\-X**, так и название фичи с **\--**.
 
 # METHODS
 
 ## new_from_args ($pkg, $args)
 
-Constructor. It creates a script-object with command-line parameters.
-
-```perl
-use lib "lib";
-use Scripts::MyScript;
-Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands  # --> [1,2,3]
-```
+Конструктор. Он создает объект сценария с параметрами командной строки.
 
 # AUTHOR
 

@@ -1,6 +1,0 @@
-#!/usr/bin/env perl
-# rubric: run
-# remark: „Go to script, feature, method or file with a line number”
-#   name: goto
-use Aion::Run::GotoScript;
-Aion::Run::GotoScript->new_from_args(\@ARGV)->goto;

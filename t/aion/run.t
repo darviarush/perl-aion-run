@@ -1,6 +1,7 @@
-use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { my ($p) = @_; length($`) && !-e $`? mkdir($`, 0755) || die "mkdir $`: $!": () while $p =~ m!/!g; $p } BEGIN { use Scalar::Util qw//; use Carp qw//; $SIG{__DIE__} = sub { my ($s) = @_; if(ref $s) { $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s; die $s } else {die Carp::longmess defined($s)? $s: "undef" }}; my $t = `pwd`; chop $t; $t .= '/' . __FILE__; my $s = '/tmp/.liveman/perl-aion-run!aion!run/'; `rm -fr '$s'` if -e $s; chdir _mkpath_($s) or die "chdir $s: $!"; open my $__f__, "<:utf8", $t or die "Read $t: $!"; read $__f__, $s, -s $__f__; close $__f__; while($s =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { my ($file, $code) = ($1, $2); $code =~ s/^#>> //mg; open my $__f__, ">:utf8", _mkpath_($file) or die "Write $file: $!"; print $__f__ $code; close $__f__; } } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  use String::Diff qw//; use Data::Dumper qw//; use Term::ANSIColor qw//;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} }  my $white = Term::ANSIColor::color('BRIGHT_WHITE'); my $red = Term::ANSIColor::color('BRIGHT_RED'); my $green = Term::ANSIColor::color('BRIGHT_GREEN'); my $reset = Term::ANSIColor::color('RESET'); my @diff = ( 	remove_open => "$white\[$red", 	remove_close => "$white]$reset", 	append_open => "$white\{$green", 	append_close => "$white}$reset", );  sub _string_diff { 	my ($got, $expected, $chunk) = @_; 	$got = substr($got, 0, length $expected) if $chunk == 1; 	$got = substr($got, -length $expected) if $chunk == -1; 	String::Diff::diff_merge($got, $expected, @diff) }  sub _struct_diff { 	my ($got, $expected) = @_; 	String::Diff::diff_merge( 		Data::Dumper->new([$got], ['diff'])->Indent(0)->Useqq(1)->Dump, 		Data::Dumper->new([$expected], ['diff'])->Indent(0)->Useqq(1)->Dump, 		@diff 	) }  # 
+# # NAME
 # 
-# Aion::Run - role for make console commands
+# Aion::Run - роль для консольных команд
 # 
 # # VERSION
 # 
@@ -8,18 +9,21 @@ use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { 
 # 
 # # SYNOPSIS
 # 
-# File lib/Scripts/MyScript.pm:
+# Файл lib/Scripts/MyScript.pm:
 #@> lib/Scripts/MyScript.pm
 #>> package Scripts::MyScript;
-#>> use common::sense;
-#>> use Aion;
 #>> 
-#>> use DDP; p @INC;
+#>> use common::sense;
+#>> 
+#>> use List::Util qw/reduce/;
+#>> use Aion::Format qw/trappout/;
+#>> 
+#>> use Aion;
 #>> 
 #>> with qw/Aion::Run/;
 #>> 
 #>> # Operands for calculations
-#>> has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a");
+#>> has operands => (is => "ro+", isa => ArrayRef[Int], arg => "-a", init_arg => "operand");
 #>> 
 #>> # Operator for calculations
 #>> has operator => (is => "ro+", isa => Enum[qw!+ - * /!], arg => 1);
@@ -27,7 +31,7 @@ use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { 
 #>> #@run math/calc „Calculate”
 #>> sub calculate_sum {
 #>>     my ($self) = @_;
-#>>     printf "Result: %g", reduce {
+#>>     printf "Result: %g\n", reduce {
 #>>         given($self->operator) {
 #>>             $a+$b when /\+/;
 #>>             $a-$b when /\-/;
@@ -41,38 +45,27 @@ use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { 
 #@< EOF
 # 
 subtest 'SYNOPSIS' => sub { 
-use Aion::Run::ScanScript;
+use Aion::Format qw/trappout/;
 
-# Apply annotations:
-Aion::Run::ScanScript->new(show => 0)->apply_annotations;
+use lib "lib";
+use Scripts::MyScript;
 
-::is scalar do {-x "script/calc"}, scalar do{1}, '-x "script/calc"  # -> 1';
-::is scalar do {-x "$ENV{HOME}/.local/bin/calc"}, scalar do{1}, '-x "$ENV{HOME}/.local/bin/calc"  # -> 1';
-
-::is scalar do {`calc -a 1 -a 2 -a 3 +`}, scalar do{6}, '`calc -a 1 -a 2 -a 3 +`  # -> 6';
-::is scalar do {`calc '*' --operands=4 --operands=2`}, scalar do{8}, '`calc \'*\' --operands=4 --operands=2`  # -> 8';
-
-unlink "$ENV{HOME}/.local/bin/calc";
+local ($::_g0 = do {trappout { Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->calculate_sum }}, $::_e0 = "Result: 6\n"); ::ok $::_g0 eq $::_e0, 'trappout { Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->calculate_sum } # => Result: 6\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {trappout { Scripts::MyScript->new_from_args([qw/--operand=4 * --operand=2/])->calculate_sum }}, $::_e0 = "Result: 8\n"); ::ok $::_g0 eq $::_e0, 'trappout { Scripts::MyScript->new_from_args([qw/--operand=4 * --operand=2/])->calculate_sum } # => Result: 8\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION
 # 
-# Role `Aion::Run` implements aspect `arg` for make feature as command-line param.
+# Роль `Aion::Run` реализует аспект `arg` для установки фич из параметров командной строки.
 # 
-# * `arg => number` — make ordered parameter.
-# * `arg => "-X"` — make keyed parameter.
+# * `arg => number` — порядковый параметр.
+# * `arg => "-X"` — именованный параметр. Можно использовать как шорткут **\-X**, так и название фичи с **\--**.
 # 
 # # METHODS
 # 
 # ## new_from_args ($pkg, $args)
 # 
-# Constructor. It creates a script-object with command-line parameters.
-# 
-done_testing; }; subtest 'new_from_args ($pkg, $args)' => sub { 
-use lib "lib";
-use Scripts::MyScript;
-::is_deeply scalar do {Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands}, scalar do {[1,2,3]}, 'Scripts::MyScript->new_from_args([qw/-a 1 -a 2 -a 3 +/])->operands  # --> [1,2,3]';
-
+# Конструктор. Он создает объект сценария с параметрами командной строки.
 # 
 # # AUTHOR
 # 
@@ -86,7 +79,7 @@ use Scripts::MyScript;
 # 
 # The Aion::Run module is copyright (с) 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
 
-	done_testing;
+	::done_testing;
 };
 
-done_testing;
+::done_testing;

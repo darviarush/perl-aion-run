@@ -1,6 +1,0 @@
-#!/usr/bin/env perl
-# rubric: run
-# remark: „Scans the current project and applies annotations”
-#   name: ann
-use Aion::Run::ScanScript;
-Aion::Run::ScanScript->new_from_args(\@ARGV)->apply_annotations;

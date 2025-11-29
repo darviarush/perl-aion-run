@@ -1,6 +1,0 @@
-#!/usr/bin/env perl
-# rubric: run
-# remark: „List of scripts”
-#   name: runs
-use Aion::Run::ListScript;
-Aion::Run::ListScript->new_from_args(\@ARGV)->list;
