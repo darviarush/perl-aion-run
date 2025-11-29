@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/darviarush/perl-aion-run/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-run/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Run.svg)](https://metacpan.org/release/Aion-Run) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-run/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Run+0.0.0-prealpha)
 # NAME
 
 Aion::Run - роль для консольных команд
