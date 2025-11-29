@@ -30,7 +30,7 @@ on 'test' => sub {
 
 requires 'Aion';
 requires 'Aion::Carp';
-requires 'Aion::Format';
+requires 'Aion::Format', '0.1.0';
 requires 'Aion::Fs';
 requires 'List::Util';
 requires 'common::sense';
