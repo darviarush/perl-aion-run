@@ -29,7 +29,7 @@ on 'test' => sub {
 };
 
 requires 'Aion', '1.2';
-requires 'Aion::Carp';
+requires 'Aion::Carp', '1.6';
 requires 'Aion::Format', '0.1.0';
 requires 'Aion::Fs', '0.2.2';
 requires 'List::Util';
