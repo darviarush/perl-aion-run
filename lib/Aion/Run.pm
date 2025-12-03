@@ -1,7 +1,7 @@
 package Aion::Run;
 use common::sense;
 
-our $VERSION = "0.0.1-prealpha";
+our $VERSION = "0.0.2-prealpha";
 
 use Aion -role;
 
@@ -80,7 +80,7 @@ Aion::Run - role for console commands
 
 =head1 VERSION
 
-0.0.1-prealpha
+0.0.2-prealpha
 
 =head1 SYNOPSIS
 
