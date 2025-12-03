@@ -5,7 +5,7 @@ Aion::Run - роль для консольных команд
 
 # VERSION
 
-0.0.0-prealpha
+0.0.1-prealpha
 
 # SYNOPSIS
 
@@ -58,14 +58,43 @@ trappout { Scripts::MyScript->new_from_args([qw/--operand=4 * --operand=2/])->ca
 
 Роль `Aion::Run` реализует аспект `arg` для установки фич из параметров командной строки.
 
-* `arg => number` — порядковый параметр.
 * `arg => "-X"` — именованный параметр. Можно использовать как шорткут **\-X**, так и название фичи с **\--**.
+* `arg => natural` — порядковый параметр. `1+`.
+* `arg => 0` — все неименованные параметры. Используется с `isa => ArrayRef`.
 
 # METHODS
 
 ## new_from_args ($pkg, $args)
 
 Конструктор. Он создает объект сценария с параметрами командной строки.
+
+```perl
+package ArgExample {
+	use Aion;
+	
+	with qw/Aion::Run/;
+	
+	has args => (is => "ro+", isa => ArrayRef[Str], arg => 0);
+	has arg => (is => "ro+", isa => ArrayRef[Str], arg => '-a');
+	has arg1 => (is => "ro+", isa => Str, arg => 1);
+	has arg2 => (is => "ro+", isa => Str, init_arg => '_arg2', arg => 2);
+	has arg_1 => (is => "ro+", isa => Str, init_arg => '_arg_1', arg => -1);
+	has arg_2 => (is => "ro+", isa => Str, arg => -2);
+}
+
+my $ex = ArgExample->new_from_args([qw/1  -a 5  2  --arg=6 -2 5 --_arg_1=4/]);
+
+$ex->arg1 # => 1
+$ex->arg2 # => 2
+$ex->arg_1 # => 4
+$ex->arg_2 # => 5
+$ex->args # --> [1, 2]
+$ex->arg # --> [5, 6]
+```
+
+# SEE ALSO
+
+* [Aion](https://metacpan.org/pod/Aion)
 
 # AUTHOR
 

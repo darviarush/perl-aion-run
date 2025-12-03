@@ -18,12 +18,12 @@ Usage:
 
 Options:
     -h, --help      Display this help message
-    --version       Display the version of act
+    -v, --version   Display the version of act
 END
     exit 0;
 }
 
-if($ARGV[0] eq '--version') {
+if($ARGV[0] ~~ ['-v', '--version']) {
 	require Aion::Run;
     print "act version ", Aion::Run->VERSION, "\n";
     exit 0;

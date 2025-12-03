@@ -1,7 +1,7 @@
 package Aion::Run;
 use common::sense;
 
-our $VERSION = "0.0.0-prealpha";
+our $VERSION = "0.0.1-prealpha";
 
 use Aion -role;
 
@@ -16,10 +16,11 @@ aspect arg => sub {
 sub new_from_args {
 	my ($pkg, $args) = @_;
 
+	my $get_key = sub { my ($feature) = @_; $feature->{opt}{init_arg} // $feature->{name} };
 	my $FEATURE = $Aion::META{$pkg}{feature};
 	my $ARG = {};
 	my $ARGUMENT = {};
-	exists $_->{arg} and do { $ARG->{$_->{arg}} = $_; $ARGUMENT->{$_->{opt}{init_arg} // $_->{name}} = $_ } for values %$FEATURE;
+	exists $_->{arg} and do { $ARG->{$_->{arg}} = $_; $ARGUMENT->{$get_key->($_)} = $_ } for values %$FEATURE;
 
 	my %param;
 
@@ -34,27 +35,34 @@ sub new_from_args {
 		}
 	};
 
-	my $count = 0;
+	my @args;
 
 	for(my $i=0; $i < @$args; $i++) {
 		local $_ = $args->[$i];
 		if(/^--([\w-]+)(?:=(.*))?\z/a) {
 			$set_feature->($1, $2);
-		} elsif(/^-(\w+)\z/a) {
+		}
+		elsif(/^-(\w+)\z/ai) {
 			for(split //, $1) {
 				my $feature = $ARG->{"-$_"} or die "Unknown option -$_";
-				my $key = $feature->{opt}{init_arg} // $feature->{name};
+				my $key = $get_key->($feature);
 				if($feature->{isa}{name} eq "Bool") {
 					$set_feature->($key, !$feature->{default});
 				} else {
 					$set_feature->($key, $args->[++$i]);
 				}
 			}
-		} else {
-			my $feature = $ARG->{++$count};
-			my $key = $feature->{name};
-			$set_feature->($key, $_);
 		}
+		else {
+			push @args, $_;
+			my $feature;
+			$set_feature->($get_key->($feature), $_) if $feature = $ARG->{@args};
+		}
+	}
+	
+	if(exists $ARG->{0}) {
+		my $key = $ARG->{0}{opt}{init_arg} // $ARG->{0}{name};
+		$param{$key} = \@args;
 	}
 
 	$pkg->new(%param)
@@ -72,7 +80,7 @@ Aion::Run - role for console commands
 
 =head1 VERSION
 
-0.0.0-prealpha
+0.0.1-prealpha
 
 =head1 SYNOPSIS
 
@@ -126,9 +134,11 @@ The C<Aion::Run> role implements the C<arg> aspect for installing features from 
 
 =over
 
-=item * C<< arg =E<gt> number >> is an ordinal parameter.
-
 =item * C<< arg =E<gt> "-X" >> is a named parameter. You can use either the shortcut B<-X> or the feature name with B<-->.
+
+=item * C<< arg =E<gt> natural >> is an ordinal parameter. C<1+>.
+
+=item * C<< arg =E<gt> 0 >> - all unnamed parameters. Used with C<< isa =E<gt> ArrayRef >>.
 
 =back
 
@@ -137,6 +147,36 @@ The C<Aion::Run> role implements the C<arg> aspect for installing features from 
 =head2 new_from_args ($pkg, $args)
 
 Constructor. It creates a script object with command line options.
+
+	package ArgExample {
+		use Aion;
+		
+		with qw/Aion::Run/;
+		
+		has args => (is => "ro+", isa => ArrayRef[Str], arg => 0);
+		has arg => (is => "ro+", isa => ArrayRef[Str], arg => '-a');
+		has arg1 => (is => "ro+", isa => Str, arg => 1);
+		has arg2 => (is => "ro+", isa => Str, init_arg => '_arg2', arg => 2);
+		has arg_1 => (is => "ro+", isa => Str, init_arg => '_arg_1', arg => -1);
+		has arg_2 => (is => "ro+", isa => Str, arg => -2);
+	}
+	
+	my $ex = ArgExample->new_from_args([qw/1  -a 5  2  --arg=6 -2 5 --_arg_1=4/]);
+	
+	$ex->arg1 # => 1
+	$ex->arg2 # => 2
+	$ex->arg_1 # => 4
+	$ex->arg_2 # => 5
+	$ex->args # --> [1, 2]
+	$ex->arg # --> [5, 6]
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Aion>
+
+=back
 
 =head1 AUTHOR
 

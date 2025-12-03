@@ -58,14 +58,43 @@ local ($::_g0 = do {trappout { Scripts::MyScript->new_from_args([qw/--operand=4 
 # 
 # Роль `Aion::Run` реализует аспект `arg` для установки фич из параметров командной строки.
 # 
-# * `arg => number` — порядковый параметр.
 # * `arg => "-X"` — именованный параметр. Можно использовать как шорткут **\-X**, так и название фичи с **\--**.
+# * `arg => natural` — порядковый параметр. `1+`.
+# * `arg => 0` — все неименованные параметры. Используется с `isa => ArrayRef`.
 # 
 # # METHODS
 # 
 # ## new_from_args ($pkg, $args)
 # 
 # Конструктор. Он создает объект сценария с параметрами командной строки.
+# 
+::done_testing; }; subtest 'new_from_args ($pkg, $args)' => sub { 
+package ArgExample {
+	use Aion;
+	
+	with qw/Aion::Run/;
+	
+	has args => (is => "ro+", isa => ArrayRef[Str], arg => 0);
+	has arg => (is => "ro+", isa => ArrayRef[Str], arg => '-a');
+	has arg1 => (is => "ro+", isa => Str, arg => 1);
+	has arg2 => (is => "ro+", isa => Str, init_arg => '_arg2', arg => 2);
+	has arg_1 => (is => "ro+", isa => Str, init_arg => '_arg_1', arg => -1);
+	has arg_2 => (is => "ro+", isa => Str, arg => -2);
+}
+
+my $ex = ArgExample->new_from_args([qw/1  -a 5  2  --arg=6 -2 5 --_arg_1=4/]);
+
+local ($::_g0 = do {$ex->arg1}, $::_e0 = "1"); ::ok $::_g0 eq $::_e0, '$ex->arg1 # => 1' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$ex->arg2}, $::_e0 = "2"); ::ok $::_g0 eq $::_e0, '$ex->arg2 # => 2' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$ex->arg_1}, $::_e0 = "4"); ::ok $::_g0 eq $::_e0, '$ex->arg_1 # => 4' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$ex->arg_2}, $::_e0 = "5"); ::ok $::_g0 eq $::_e0, '$ex->arg_2 # => 5' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$ex->args}, $::_e0 = do {[1, 2]}); ::is_deeply $::_g0, $::_e0, '$ex->args # --> [1, 2]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$ex->arg}, $::_e0 = do {[5, 6]}); ::is_deeply $::_g0, $::_e0, '$ex->arg # --> [5, 6]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# # SEE ALSO
+# 
+# * [Aion](https://metacpan.org/pod/Aion)
 # 
 # # AUTHOR
 # 
