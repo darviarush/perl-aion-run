@@ -5,7 +5,7 @@ Aion::Run - роль для консольных команд
 
 # VERSION
 
-0.0.2-prealpha
+0.0.3
 
 # SYNOPSIS
 
